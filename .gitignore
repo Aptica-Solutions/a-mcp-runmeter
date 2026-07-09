@@ -1,0 +1,52 @@
+*.pyc
+
+# --- local developer artifacts ---
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100/
+.Trashes/
+.fseventsd/
+
+# Editors and local workspaces
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.history/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+*.local
+
+# runmeter local telemetry stores
+*.db
+*.db-wal
+*.db-shm
+.runmeter/
+
+# Logs, caches, and temporary files
+*.log
+logs/
+tmp/
+temp/
+.cache/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+venv/

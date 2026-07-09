@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "runmeter": {
+      "command": "python3",
+      "args": ["/absolute/path/to/a-mcp-runmeter/server.py"],
+      "env": {
+        "RUNMETER_DB_PATH": "~/.runmeter/runmeter.db"
+      }
+    }
+  }
+}
