@@ -24,3 +24,6 @@ runmeter-mcp = "server:mcp.run"
 
 [project.urls]
 Homepage = "https://github.com/Aptica-Solutions/a-mcp-runmeter"
+
+[tool.hatch.build.targets.wheel]
+include = ["server.py"]
