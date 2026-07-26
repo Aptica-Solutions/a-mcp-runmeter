@@ -1,0 +1,27 @@
+{
+  "//": "OpenAI Codex CLI project configuration. Loaded from codex.json in the project root.",
+  "//instructions": [
+    "Add MCP servers here as you configure them.",
+    "model: set the default model for this project (overrides global config).",
+    "Commit this file — it is not a secret store. Secrets go in .env or Key Vault.",
+    "Global config lives at ~/.codex/config.json — this file overrides it for this project."
+  ],
+  "model": "o4-mini",
+  "mcpServers": {
+    "_example_filesystem": {
+      "//disabled": true,
+      "//justification": "Gives Codex direct read access to project files.",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "."]
+    },
+    "_example_azure": {
+      "//disabled": true,
+      "//justification": "Allows Codex to query live Azure resource state.",
+      "command": "npx",
+      "args": ["-y", "@azure/mcp-server"],
+      "env": {
+        "AZURE_SUBSCRIPTION_ID": "${AZURE_SUBSCRIPTION_ID}"
+      }
+    }
+  }
+}

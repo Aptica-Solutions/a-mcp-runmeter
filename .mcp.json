@@ -1,0 +1,13 @@
+{
+  "_comment": "Project-level MCP server configuration. Loaded by Claude Code. See _engineer/ENGINEER-README.md for selection criteria.",
+  "_instructions": [
+    "Add MCP servers here as you configure them.",
+    "Include a comment block for each server with: purpose, justification, and access scope.",
+    "Prefer read-only access where possible.",
+    "Do not add servers that transmit sensitive data to third parties without consent.",
+    "Commit this file — it is not a secret store. Secrets go in .env or Key Vault.",
+    "There is no '_disabled' field. Any server listed under mcpServers is real and Claude Code will launch it once approved. To turn one off, remove it here or add its name to 'disabledMcpjsonServers' in .claude/settings.local.json.",
+    "Do not commit placeholder/example servers: they get approved into 'enabledMcpjsonServers' and then crash-loop on startup. Document examples in ENGINEER-README.md instead."
+  ],
+  "mcpServers": {}
+}

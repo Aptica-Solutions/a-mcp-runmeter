@@ -1,0 +1,26 @@
+{
+  "//": "Gemini CLI project configuration. Loaded from .gemini/settings.json in the project root.",
+  "//instructions": [
+    "Add MCP servers here as you configure them.",
+    "Each entry requires: command, args (optional), env (optional).",
+    "Commit this file — it is not a secret store. Secrets go in .env or Key Vault.",
+    "Global config lives at ~/.gemini/settings.json — project config overrides per-server."
+  ],
+  "mcpServers": {
+    "_example_filesystem": {
+      "//disabled": true,
+      "//justification": "Gives Gemini direct read access to project files.",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "."]
+    },
+    "_example_azure": {
+      "//disabled": true,
+      "//justification": "Allows Gemini to query live Azure resource state.",
+      "command": "npx",
+      "args": ["-y", "@azure/mcp-server"],
+      "env": {
+        "AZURE_SUBSCRIPTION_ID": "${AZURE_SUBSCRIPTION_ID}"
+      }
+    }
+  }
+}

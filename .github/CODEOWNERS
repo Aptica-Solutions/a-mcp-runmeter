@@ -1,0 +1,12 @@
+# CODEOWNERS
+# Requires review from listed owners before merging changes to these paths.
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default — all files require review
+*                          @your-github-handle
+
+# Security-sensitive paths require explicit sign-off
+.github/workflows/         @your-github-handle
+infra/                     @your-github-handle
+SECURITY.md                @your-github-handle
+.env.example               @your-github-handle

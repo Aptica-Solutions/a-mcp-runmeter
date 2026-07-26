@@ -1,0 +1,76 @@
+# Pre-commit hook configuration.
+# Committed to the repo so all developers get the same hooks.
+#
+# Setup (once per developer, after cloning):
+#   pip install pre-commit   # or: brew install pre-commit
+#   pre-commit install
+#
+# Run manually against all files:
+#   pre-commit run --all-files
+#
+# Update hook revisions:
+#   pre-commit autoupdate
+
+# Install both the pre-commit and commit-msg git hooks on `pre-commit install`,
+# and pin every hook to the pre-commit stage unless it opts into another stage,
+# so the Co-Authored-By stripper is the only thing that runs at commit-msg.
+default_install_hook_types: [pre-commit, commit-msg]
+default_stages: [pre-commit]
+
+repos:
+  # ── Template boundary ─────────────────────────────────────────────────────
+  - repo: local
+    hooks:
+      - id: template-manifest-integrity
+        name: Template manifest — tracked files and .templatefiles must match
+        entry: python .claude/hooks/check-templatefiles.py --check-manifest
+        language: python
+        pass_filenames: false
+        always_run: true
+
+      - id: template-boundary
+        name: Template boundary — staged files must be in .templatefiles
+        entry: python .claude/hooks/check-templatefiles.py
+        language: python
+        pass_filenames: true
+        types: [file]
+
+      # ── Strip AI Co-Authored-By trailers (any assistant) ──────────────────
+      - id: strip-ai-coauthors
+        name: Strip AI Co-Authored-By trailers
+        entry: python .claude/hooks/strip-ai-coauthors.py
+        language: python
+        stages: [commit-msg]
+
+  # ── Secret scanning ───────────────────────────────────────────────────────
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks
+        name: Detect hardcoded secrets (gitleaks)
+
+  # ── Add additional hooks below as the stack is defined ───────────────────
+  # Examples (uncomment and pin as needed):
+  #
+  # Node / TypeScript:
+  # - repo: https://github.com/pre-commit/mirrors-eslint
+  #   rev: v9.x.x
+  #   hooks:
+  #     - id: eslint
+  #       files: \.(js|ts|tsx)$
+  #       additional_dependencies: [...]
+  #
+  # Python:
+  # - repo: https://github.com/astral-sh/ruff-pre-commit
+  #   rev: v0.x.x
+  #   hooks:
+  #     - id: ruff
+  #     - id: ruff-format
+  #
+  # General:
+  # - repo: https://github.com/pre-commit/pre-commit-hooks
+  #   rev: vX.x.x
+  #   hooks:
+  #     - id: trailing-whitespace
+  #     - id: end-of-file-fixer
+  #     - id: check-merge-conflict

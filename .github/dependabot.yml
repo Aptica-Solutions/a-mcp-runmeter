@@ -1,0 +1,34 @@
+version: 2
+
+# Dependabot version updates — opens PRs to keep dependencies current.
+# Security alerts are enabled separately: GitHub repo → Settings → Code security → Dependabot alerts.
+#
+# Adjust or remove ecosystem blocks to match the actual stack once backend/frontend are initialized.
+
+updates:
+  # GitHub Actions workflow pins
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  # Node.js — backend (enable once backend/package.json exists)
+  # - package-ecosystem: "npm"
+  #   directory: "/backend"
+  #   schedule:
+  #     interval: "weekly"
+  #   open-pull-requests-limit: 10
+
+  # Node.js — frontend (enable once frontend/package.json exists)
+  # - package-ecosystem: "npm"
+  #   directory: "/frontend"
+  #   schedule:
+  #     interval: "weekly"
+  #   open-pull-requests-limit: 10
+
+  # Python (enable once requirements.txt exists)
+  # - package-ecosystem: "pip"
+  #   directory: "/"
+  #   schedule:
+  #     interval: "weekly"
+  #   open-pull-requests-limit: 10

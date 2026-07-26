@@ -1,0 +1,206 @@
+{
+  "schema_version": 1,
+  "source_repository": "Aptica-Solutions/a-repo-template",
+  "template_release": "template-v2026.07.2",
+  "template_commit": "ff8f02915cde37fd0257e65cfb255086d869321b",
+  "template_profile": "standard",
+  "applied_at": "2026-07-26T03:15:39.548144+00:00",
+  "files": {
+    "CLAUDE.md": {
+      "template_blob": "325fb2d0670a1decf6dbea677b65827646dbc069",
+      "policy": "three-way"
+    },
+    "AGENTS.md": {
+      "template_blob": "ab1dc8001a16c74c52c5c284c6f86d0971cca292",
+      "policy": "three-way"
+    },
+    "GEMINI.md": {
+      "template_blob": "5e4af6de4534bcac0aed90e57511d5a89d7c55e0",
+      "policy": "three-way"
+    },
+    "_engineer/ENGINEER-README.md": {
+      "template_blob": "007bb3297aa4326e8335598a4cd894b65724f2f9",
+      "policy": "three-way"
+    },
+    "_engineer/ENGINEER-FLOW.md": {
+      "template_blob": "6a3f38537bfcb0f9e276fa9730e8243ce7d70a13",
+      "policy": "three-way"
+    },
+    "_engineer/ONBOARDING.template.md": {
+      "template_blob": "0686b1399544183b1d719a3e97d5ed1d090358b0",
+      "policy": "three-way"
+    },
+    "_engineer/REQUIREMENTS.template.md": {
+      "template_blob": "0d953b5b0fe216e1f38d0f6648137eed490eab36",
+      "policy": "three-way"
+    },
+    "_engineer/ENGINEER-TASKS.md": {
+      "template_blob": "7bb4774fd99d3f4910017b55f2ed47bbdd40194e",
+      "policy": "seed"
+    },
+    "AI-TASKS.template.md": {
+      "template_blob": "e025c91d374e38d86a96e83f367bf8af32597488",
+      "policy": "three-way"
+    },
+    "_engineer/hipaa-sanitize/hipaa_redact.py": {
+      "template_blob": "4b84f4caef5778a1e668da50bacf5a31f3ff3034",
+      "policy": "three-way"
+    },
+    "_engineer/hipaa-sanitize/HIPAA-SANITIZE.md": {
+      "template_blob": "c22e0ae48498779efaba350449949f3060411f95",
+      "policy": "three-way"
+    },
+    "_engineer/ado-sync/ado_lib.py": {
+      "template_blob": "75d029b9bca76934b10596778df1d77e4578d93d",
+      "policy": "three-way"
+    },
+    "_engineer/ado-sync/ado_repo_sync.py": {
+      "template_blob": "8b9998aba73298537bba9fdc5af88bb355c2a94f",
+      "policy": "three-way"
+    },
+    "_engineer/ado-sync/ai_ado_creator.py": {
+      "template_blob": "f8beb88a4de7a3c60276ae67fd20656020dcc1c9",
+      "policy": "three-way"
+    },
+    "_engineer/ado-sync/ADO-SYNC.md": {
+      "template_blob": "80c586a3abea1492befd84f7c50d7ca658176431",
+      "policy": "three-way"
+    },
+    "_engineer/dev-env/bootstrap-profile.ps1": {
+      "template_blob": "6d946b1302a6dd38bd9a128acc8302f1d904afbe",
+      "policy": "three-way"
+    },
+    "_engineer/dev-env/functions.ps1": {
+      "template_blob": "7b49b87341f672b0fba6756a97b874c585c50d08",
+      "policy": "three-way"
+    },
+    "_engineer/dev-env/init-repo-tooling.ps1": {
+      "template_blob": "529dab05700aae7f3da9ec2cfd653bce7c675caa",
+      "policy": "three-way"
+    },
+    "_engineer/dev-env/PROFILE-README.md": {
+      "template_blob": "ca0737af6c24bcfe970e590343d927034fe3e104",
+      "policy": "three-way"
+    },
+    "_engineer/dev-env/profile.ps1": {
+      "template_blob": "3c4a61c4b045de1b736b642d030272eae7cc0565",
+      "policy": "three-way"
+    },
+    "_engineer/dev-env/template-sync.ps1": {
+      "template_blob": "f0e0b7a56d0ec2e19e24ae52bb1844ac8ebc50a6",
+      "policy": "three-way"
+    },
+    "_engineer/dev-env/template_sync.py": {
+      "template_blob": "d52a97b4e9cfa29f4565bc1194335ae72cc07fc9",
+      "policy": "three-way"
+    },
+    "_engineer/dev-env/log_util.py": {
+      "template_blob": "1123e067d8d2bab06dab1542dae2fc0cd701c0c4",
+      "policy": "three-way"
+    },
+    "requirements.txt": {
+      "template_blob": "ead32e19a2371c9c6517aa346c8eda6ad67b731d",
+      "policy": "seed"
+    },
+    "_engineer/test-case-automation/new-test-case.ps1": {
+      "template_blob": "018f69307e98b72fe3d3bec011df0d81d48e721a",
+      "policy": "three-way"
+    },
+    ".claude/commands/handoff.md": {
+      "template_blob": "fd36269773e19b161246be3bc02c3c9a01009095",
+      "policy": "three-way"
+    },
+    ".claude/commands/project-init.md": {
+      "template_blob": "2d1d9f08e56774a3aaf30283a0eccdd09f77d563",
+      "policy": "three-way"
+    },
+    ".claude/hooks/survey-gate.ps1": {
+      "template_blob": "c91e23dd0050a3655d030a9198cc1f8cad728aa3",
+      "policy": "three-way"
+    },
+    ".claude/hooks/check-templatefiles.py": {
+      "template_blob": "fc8bb65c7df3c7bdcc3e61cba00683b224205785",
+      "policy": "three-way"
+    },
+    ".claude/hooks/strip-ai-coauthors.py": {
+      "template_blob": "c506ac0ba74281b9f25fe90292bc3bef1f074f15",
+      "policy": "three-way"
+    },
+    ".claude/settings.json": {
+      "template_blob": "cc467bd1ca0d68b5f1bd5f3cc882f6f1f4a68b15",
+      "policy": "three-way"
+    },
+    ".github/workflows/template-boundary.yml": {
+      "template_blob": "b8a477021d953fa30a52226facae1994ec12d531",
+      "policy": "three-way"
+    },
+    ".github/dependabot.yml": {
+      "template_blob": "fba86ba3e555a369757884c3b905777cd9c82058",
+      "policy": "seed"
+    },
+    ".github/CODEOWNERS": {
+      "template_blob": "95795674fe5062d08537ebd7ca2fe4594c2dd9e8",
+      "policy": "seed"
+    },
+    ".github/copilot-instructions.md": {
+      "template_blob": "037fc4654bec32b5920312476630807aba69a7f1",
+      "policy": "three-way"
+    },
+    ".pre-commit-config.yaml": {
+      "template_blob": "6aeab9630b8eed4436dce454487769eea7b95e36",
+      "policy": "three-way"
+    },
+    "docs/DEMO.template.md": {
+      "template_blob": "17e0dbc20e2148ae6c2b456d6acbc1420ff8e0a8",
+      "policy": "three-way"
+    },
+    "docs/DEVELOPER.template.md": {
+      "template_blob": "f1eca33b7637e0d545b5a594b0eb2747c23bf6bf",
+      "policy": "three-way"
+    },
+    "docs/ENGINEER.template.md": {
+      "template_blob": "670f03b55a19c2113722bb52d61fd03230272789",
+      "policy": "three-way"
+    },
+    "docs/GOVERNANCE.template.md": {
+      "template_blob": "f5be03efa97acbb3f3bf5cdcd55bb9e2e1a8b8e7",
+      "policy": "three-way"
+    },
+    "docs/INFRA.template.md": {
+      "template_blob": "e0e3cae1ac0b81c159498873e17c78dc92a289d3",
+      "policy": "three-way"
+    },
+    "docs/LEADERSHIP.template.md": {
+      "template_blob": "6a045d929bf6d99affe3905c90e45713b045bb9c",
+      "policy": "three-way"
+    },
+    "docs/QA.template.md": {
+      "template_blob": "9cc8100dd0ea809873b759a6bae95c0ea32aea2d",
+      "policy": "three-way"
+    },
+    "docs/SYSADMIN.template.md": {
+      "template_blob": "34d166eca56b3feae4f8fe66f15ec891fa9cdee8",
+      "policy": "three-way"
+    },
+    ".gitignore": {
+      "template_blob": "98dd6180000612fc78b1f32f5b9166f53e928cf5",
+      "policy": "seed"
+    },
+    ".gitattributes": {
+      "template_blob": "7baefcb2e3c9024a239169c302c13ab39021731e",
+      "policy": "seed"
+    },
+    ".mcp.json": {
+      "template_blob": "86dc2738a681bc145d82b762984acc6a67a62e13",
+      "policy": "seed"
+    },
+    ".gemini/settings.json": {
+      "template_blob": "f5555fd954742d246d66956ca32d0846e9f6c67d",
+      "policy": "seed"
+    },
+    "codex.json": {
+      "template_blob": "9fbbc7c2c160a2c664bfb476c9e97a328ef33253",
+      "policy": "seed"
+    }
+  }
+}
