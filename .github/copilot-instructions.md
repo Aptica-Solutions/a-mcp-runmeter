@@ -5,33 +5,6 @@ This file is a Copilot-specific summary. MCP servers are configured in `.vscode/
 
 ---
 
-## ONBOARDING GATE — Read This First
-
-### Canonical template repository exception
-
-Before applying this gate, determine whether the current checkout is the canonical
-template source. Both conditions must be true:
-
-1. `.is-template-repo` exists in the repository root.
-2. `git remote get-url origin` identifies `Aptica-Solutions/a-repo-template` or
-   the legacy `szeltneraptica/repo-template` GitHub repository.
-
-This read-only check is permitted before onboarding. If both conditions are true,
-the onboarding gate and the requirement to read `AI-TASKS.md` do not apply;
-template review, maintenance, and validation may proceed without project onboarding
-artifacts. Never rely on the marker alone because GitHub copies it into newly
-created repositories until initialization removes it.
-
-**Do not write code, create files, plan architecture, run scripts, or make any project decisions until `ONBOARDING.md` exists in the project root and the user has confirmed it is accurate.**
-
-If `ONBOARDING.md` is missing or empty:
-> "ONBOARDING.md not found. Complete the survey in `_engineer/ONBOARDING.template.md` and save it as `ONBOARDING.md` before I can begin any project work."
-
-If `ONBOARDING.md` exists but has not been confirmed this session, ask once:
-> "Is ONBOARDING.md current and accurate? (yes to confirm / describe what changed)"
-
----
-
 ## Project Context
 
 TODO: Describe the project domain, tech stack, and primary users.

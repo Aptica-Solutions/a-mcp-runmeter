@@ -4,37 +4,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ---
 
-## ONBOARDING GATE — Read This First
-
-### Canonical template repository exception
-
-Before applying this gate, determine whether the current checkout is the canonical
-template source. Both conditions must be true:
-
-1. `.is-template-repo` exists in the repository root.
-2. `git remote get-url origin` identifies `Aptica-Solutions/a-repo-template` or
-   the legacy `szeltneraptica/repo-template` GitHub repository.
-
-This read-only check is permitted before onboarding. If both conditions are true,
-the onboarding gate and the requirement to read `AI-TASKS.md` do not apply;
-template review, maintenance, and validation may proceed without project onboarding
-artifacts. Never rely on the marker alone because GitHub copies it into newly
-created repositories until initialization removes it.
-
-**Do not write code, create files, plan architecture, run scripts, or make any project decisions until `ONBOARDING.md` exists in the project root and the user has confirmed it is accurate in this session.**
-
-If `ONBOARDING.md` is missing or empty:
-> "ONBOARDING.md not found. I cannot begin any project work until the survey is complete. Please run `/project-init`."
-
-If `ONBOARDING.md` exists but has not been confirmed this session, ask once:
-> "Is ONBOARDING.md current and accurate for this project? (yes to confirm / describe what changed)"
-
-The gate applies to all work — coding, planning, infra, documentation, and task creation. Answering questions about the template itself is permitted.
-
-A `UserPromptSubmit` hook in `.claude/settings.json` enforces this automatically on every prompt.
-
----
-
 ## What This Repo Is
 
 This is an enterprise **project template** — a scaffold for Azure-based solutions. `backend/` and `frontend/` are empty stubs. Fill in the actual solution; treat everything in `_engineer/` as the engineering meta-layer (AI context, task tracking, ADO sync, dev tooling).
@@ -123,30 +92,16 @@ Switch explicitly — paste the relevant snippet into the chat.
 
 ---
 
-## Initialization
-
-To start a new project from this template, run the `/project-init` slash command. It walks through:
-1. Loading and confirming all rules
-2. An interactive survey (writes `ONBOARDING.md`)
-3. Tooling setup (gitleaks, venv, deps)
-4. Environment verification and handoff to Plan mode
-
-Underlying scripts (also callable standalone):
-- `pwsh -NoProfile -File "_engineer/dev-env/init-repo-tooling.ps1"` — cross-platform tooling setup + verification (macOS and Windows)
-
----
-
 ## Engineer Flow
 
 Follow `_engineer/ENGINEER-FLOW.md` strictly. The required sequence:
 
-1. Complete `ONBOARDING.md` and `REQUIREMENTS.md` (do not write code before this)
-2. Enter Plan mode — confirm AI understands ONBOARDING, guardrails, and REQUIREMENTS
+1. Complete `REQUIREMENTS.md` (do not write code before this)
+2. Enter Plan mode — confirm AI understands guardrails and REQUIREMENTS
 3. Build `AI-TASKS.md` from approved plan
 4. Switch to Code mode, work one task at a time
 5. Write tests at end of each PBI (80%+ coverage target)
 
-**Do not start coding without explicit user confirmation that ONBOARDING is complete and accurate.**
 
 ---
 
