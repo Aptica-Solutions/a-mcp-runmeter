@@ -96,3 +96,17 @@ def test_new_project_config_reprocesses_cached_files(tmp_path):
 def test_source_storage_rejected(tmp_path):
     cfg=config(tmp_path);cfg['projects'][0]['root']=str(tmp_path)
     with pytest.raises(ValueError,match='external'):c.run(cfg)
+
+
+def test_confirmed_project_opt_out_stops_future_project_writes(tmp_path):
+    cfg=config(tmp_path);project=cfg['projects'][0]
+    project['root']=str(tmp_path/'repo');project['require_opt_in']=True
+    choice=Path(project['root'])/'.aptica/ai-cost.json';choice.parent.mkdir(parents=True)
+    data={'mode':'development','project_id':project['project_id'],'environment':project['environment']}
+    choice.write_text(json.dumps(data))
+    write(tmp_path/'transcripts/session.jsonl',[claude(id='first',cwd=project['root'])]);c.run(cfg)
+    data['mode']='none';choice.write_text(json.dumps(data))
+    write(tmp_path/'transcripts/session.jsonl',[claude(id='first',cwd=project['root']),claude(id='second',cwd=project['root'])]);c.run(cfg)
+    with sqlite3.connect(project['database']) as db:assert db.execute('select count(*) from runs').fetchone()[0]==1
+    data['mode']='development';choice.write_text(json.dumps(data));c.run(cfg)
+    with sqlite3.connect(project['database']) as db:assert db.execute('select count(*) from runs').fetchone()[0]==2

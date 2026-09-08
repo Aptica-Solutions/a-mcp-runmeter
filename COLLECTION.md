@@ -7,7 +7,9 @@ interval. Configuration, databases, and snapshots belong outside source control.
 
 The host database is separate from earlier importers. Existing MCP rows are not
 changed. Optional project stores receive matching records based on explicit root
-mappings; other work remains unattributed. No project is discovered or enrolled
+mappings; other work remains unattributed. Set `require_opt_in: true` on a project
+to require its generated `.aptica/ai-cost.json` to select development or both.
+Disabling that choice stops future project writes without deleting history. No project is discovered or enrolled
 implicitly. Worktrees need their own approved root mapping.
 
 ## Configuration
