@@ -124,3 +124,7 @@ MIT. See [LICENSE](LICENSE).
 ---
 
 Built by [Aptica Solutions](https://github.com/Aptica-Solutions).
+
+## Continuous collection
+
+The optional `runmeter-collect` command imports local assistant usage idempotently and exports metadata-only aggregates. See [COLLECTION.md](COLLECTION.md) for configuration and coverage limits.

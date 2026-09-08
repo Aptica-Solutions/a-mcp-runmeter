@@ -14,18 +14,6 @@
       "Bash(DROP DATABASE*)"
     ]
   },
-  "hooks": {
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "pwsh -NoProfile -File .claude/hooks/survey-gate.ps1"
-          }
-        ]
-      }
-    ]
-  },
   "attribution": {
     "commit": "",
     "pr": "",

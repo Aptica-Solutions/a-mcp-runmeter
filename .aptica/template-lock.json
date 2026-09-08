@@ -26,10 +26,6 @@
       "template_blob": "6a3f38537bfcb0f9e276fa9730e8243ce7d70a13",
       "policy": "three-way"
     },
-    "_engineer/ONBOARDING.template.md": {
-      "template_blob": "0686b1399544183b1d719a3e97d5ed1d090358b0",
-      "policy": "three-way"
-    },
     "_engineer/REQUIREMENTS.template.md": {
       "template_blob": "0d953b5b0fe216e1f38d0f6648137eed490eab36",
       "policy": "three-way"
@@ -108,14 +104,6 @@
     },
     ".claude/commands/handoff.md": {
       "template_blob": "fd36269773e19b161246be3bc02c3c9a01009095",
-      "policy": "three-way"
-    },
-    ".claude/commands/project-init.md": {
-      "template_blob": "2d1d9f08e56774a3aaf30283a0eccdd09f77d563",
-      "policy": "three-way"
-    },
-    ".claude/hooks/survey-gate.ps1": {
-      "template_blob": "c91e23dd0050a3655d030a9198cc1f8cad728aa3",
       "policy": "three-way"
     },
     ".claude/hooks/check-templatefiles.py": {
