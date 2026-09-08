@@ -248,7 +248,16 @@ def run(config):
     database = Path(config['database']).expanduser().resolve()
     summary = Path(config['summary']).expanduser().resolve()
     since = stamp(config['since'])
-    projects = config.get('projects',[])
+    projects = []
+    for project in config.get('projects',[]):
+        if project.get('require_opt_in'):
+            choice_path = Path(project['root'])/'.aptica/ai-cost.json'
+            if not choice_path.exists(): continue
+            choice = json.loads(choice_path.read_text())
+            if choice.get('mode') not in ('development','both'): continue
+            if any(choice.get(key) != project[key] for key in ('project_id','environment')):
+                raise ValueError('Project choice differs from host mapping')
+        projects.append(project)
     for p in projects:
         if safe_name(p['project_id']) != p['project_id'] or safe_name(p['environment']) != p['environment']:
             raise ValueError('Invalid project labels')
@@ -266,7 +275,7 @@ def run(config):
             project_connections[(p['project_id'],p['environment'])] = connect(target)
         # Configuration changes invalidate the scan cache, including newly enabled
         # projects and pricing. No raw paths are written into the cache.
-        config_hash=digest(json.dumps(config,sort_keys=True))
+        config_hash=digest(json.dumps({**config,'resolved_projects':projects},sort_keys=True))
         for source in config['sources']:
             name=source['kind']
             if name not in ('cowork','claude-code','codex'):
