@@ -72,3 +72,7 @@ beside the private host configuration. A current standard-rate API-equivalent
 valuation is not historical invoiced spend: promotions, fast processing, regional
 premiums, tool fees, and subscription charges require their own evidence. Updating
 configured prices safely revalues imported usage without adding duplicate rows.
+
+Providers that charge a flat cache-write rate independent of lifetime can configure
+`cache_write_unknown` explicitly. Do not configure it for providers whose unknown
+lifetime could select different prices. Missing category rates remain unpriced.

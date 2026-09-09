@@ -164,7 +164,7 @@ def parse(path, source, projects, health):
 
 def price(record, pricing):
     rates = pricing.get(record['model'])
-    if not isinstance(rates, dict) or not rates or record['cache_write_unknown']:
+    if not isinstance(rates, dict) or not rates:
         return None
     tier = rates.get('long_context')
     if tier is not None:
@@ -176,7 +176,7 @@ def price(record, pricing):
             rates = tier.get('rates')
             if not isinstance(rates, dict) or not rates: return None
     total = 0.0
-    for field in ('uncached_input','cache_read','cache_write_5m','cache_write_1h','output_tokens'):
+    for field in ('uncached_input','cache_read','cache_write_5m','cache_write_1h','cache_write_unknown','output_tokens'):
         if not record[field]:
             continue
         rate = rates.get(field)

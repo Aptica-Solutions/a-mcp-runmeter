@@ -123,3 +123,10 @@ def test_missing_long_context_rate_remains_unpriced():
     record={'model':'test','input_tokens':3,'uncached_input':3,'cache_read':0,'cache_write_5m':0,'cache_write_1h':0,'cache_write_unknown':0,'output_tokens':2}
     pricing={'test':{'uncached_input':1,'output_tokens':1,'long_context':{'above_input_tokens':2}}}
     assert c.price(record,pricing) is None
+
+
+
+def test_explicit_flat_cache_write_rate_without_lifetime():
+    record={'model':'test','input_tokens':100,'uncached_input':0,'cache_read':0,'cache_write_5m':0,'cache_write_1h':0,'cache_write_unknown':100,'output_tokens':0}
+    assert c.price(record,{'test':{'cache_write_unknown':12.5}})==pytest.approx(0.00125)
+    assert c.price(record,{'test':{'cache_write_5m':12.5}}) is None
