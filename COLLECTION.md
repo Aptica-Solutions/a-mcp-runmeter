@@ -57,3 +57,18 @@ The initial integration verified replay, growth, duplicate forks, both Codex eve
 families, cache pricing, unknown models, additive migration, project isolation,
 and metadata privacy with synthetic fixtures. Snapshot consumers must preserve
 coverage and unpriced counts alongside the totals.
+
+
+## Context-sensitive rates
+
+An optional `long_context` object contains `above_input_tokens` and a complete
+`rates` mapping with the same token-category keys. Requests strictly above the
+threshold use that mapping for all input, cache, and output tokens. Total input
+includes cached input. A missing selected tier remains unpriced rather than
+falling back to the cheaper tier.
+
+Record the verification date, official source URLs, currency, and valuation basis
+beside the private host configuration. A current standard-rate API-equivalent
+valuation is not historical invoiced spend: promotions, fast processing, regional
+premiums, tool fees, and subscription charges require their own evidence. Updating
+configured prices safely revalues imported usage without adding duplicate rows.

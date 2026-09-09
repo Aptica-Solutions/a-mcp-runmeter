@@ -110,3 +110,16 @@ def test_confirmed_project_opt_out_stops_future_project_writes(tmp_path):
     with sqlite3.connect(project['database']) as db:assert db.execute('select count(*) from runs').fetchone()[0]==1
     data['mode']='development';choice.write_text(json.dumps(data));c.run(cfg)
     with sqlite3.connect(project['database']) as db:assert db.execute('select count(*) from runs').fetchone()[0]==2
+
+
+@pytest.mark.parametrize('inputs,expected',[(272000,0.272010),(272001,0.544017)])
+def test_context_price_boundary_includes_cache_and_entire_output(inputs,expected):
+    record={'model':'test','input_tokens':inputs,'uncached_input':0,'cache_read':inputs,'cache_write_5m':0,'cache_write_1h':0,'cache_write_unknown':0,'output_tokens':2}
+    pricing={'test':{'uncached_input':10,'cache_read':1,'output_tokens':5,'long_context':{'above_input_tokens':272000,'rates':{'uncached_input':20,'cache_read':2,'output_tokens':7.5}}}}
+    assert c.price(record,pricing)==pytest.approx(expected)
+
+
+def test_missing_long_context_rate_remains_unpriced():
+    record={'model':'test','input_tokens':3,'uncached_input':3,'cache_read':0,'cache_write_5m':0,'cache_write_1h':0,'cache_write_unknown':0,'output_tokens':2}
+    pricing={'test':{'uncached_input':1,'output_tokens':1,'long_context':{'above_input_tokens':2}}}
+    assert c.price(record,pricing) is None
