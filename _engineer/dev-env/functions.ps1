@@ -603,7 +603,7 @@ function New-RepoFromTemplate {
         } finally { Remove-Item -LiteralPath $tmp -Recurse -Force -ErrorAction SilentlyContinue }
 
         Write-Host ''
-        $ans = Read-Host 'Initialize AI context files? (CLAUDE.md, copilot-instructions.md) [Y/n]'
+        $ans = Read-Host 'Initialize AI context files? (AGENTS.md, CLAUDE.md stub) [Y/n]'
         if ($ans -eq '' -or $ans -match '^[Yy]') {
             Initialize-AiContext -Path $target
         }
@@ -647,8 +647,8 @@ function Initialize-AiContext {
     .SYNOPSIS
         Scaffolds AI context files into a repository.
     .DESCRIPTION
-        Creates starter files for Claude Code (CLAUDE.md) and GitHub Copilot
-        (.github/copilot-instructions.md).
+        Creates AGENTS.md, the one rules file every agent reads, and a one-line
+        CLAUDE.md stub that imports it.
         Skips any file that already exists unless -Force is specified.
     .PARAMETER Path
         Target repository root. Defaults to the current directory.
@@ -665,7 +665,7 @@ function Initialize-AiContext {
     $name = Split-Path $root -Leaf
 
     $files = [ordered]@{
-        'CLAUDE.md' = @"
+        'AGENTS.md' = @"
 # $name
 
 ## Overview
@@ -691,21 +691,7 @@ TODO: Note any naming conventions, coding standards, or patterns the AI should f
 TODO: List anything the AI should not touch or suggest changes to.
 "@
 
-        '.github/copilot-instructions.md' = @"
-# GitHub Copilot Instructions — $name
-
-## Project Context
-TODO: Describe the project so Copilot understands the domain.
-
-## Preferred Patterns
-- TODO: List preferred libraries, frameworks, or approaches.
-
-## Avoid
-- TODO: List patterns, libraries, or anti-patterns to avoid.
-
-## Testing
-- TODO: Describe the testing approach (unit, integration, e2e).
-"@
+        'CLAUDE.md' = ('@AGENTS.md' + "`n")
 
     }
 
@@ -813,7 +799,7 @@ $script:_Manifest = @(
     [PSCustomObject]@{ P = 'ANY'; Name = 'Invoke-HipaaRedact';             Note = '-InputPdf <p> [-OutputPdf <p>] [-OffsetDays <n>] [-Names ...] [-Facilities ...]' }
     [PSCustomObject]@{ P = 'ANY'; Name = 'Invoke-ProjectSetup';            Note = '[-Repo <path>]  create .venv and install requirements.txt' }
     [PSCustomObject]@{ P = 'ANY'; Name = 'New-RepoFromTemplate';           Note = '-Name <n> [-Destination <p>] [-FreshHistory] | -Apply <path> [-Force]' }
-    [PSCustomObject]@{ P = 'ANY'; Name = 'Initialize-AiContext';           Note = 'Scaffold CLAUDE.md, copilot-instructions.md  [-Path] [-Force]' }
+    [PSCustomObject]@{ P = 'ANY'; Name = 'Initialize-AiContext';           Note = 'Scaffold AGENTS.md, CLAUDE.md stub  [-Path] [-Force]' }
     [PSCustomObject]@{ P = 'ANY'; Name = 'Show-AuthStatus';                Note = 'Show gh / az / op login status' }
     [PSCustomObject]@{ P = 'ANY'; Name = 'Show-ProfileHelp';               Note = 'Show this list again' }
 )

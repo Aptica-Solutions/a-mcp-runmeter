@@ -18,6 +18,12 @@ When filling in this template from ONBOARDING.md answers:
 - **Entity:** TODO
 - **Environments:** dev · test · prod
 - **Compliance:** TODO — choose from: HIPAA / SOC 2 / PCI DSS / None
+- **AI Impact Tier:** TODO — T0 / T1 / T2 / T3 per ONBOARDING "AI Impact Tier"
+- **Tier rationale:** TODO — one sentence, required when the call was close
+
+> The tier governs which gates in `_engineer/ASSURANCE.md` apply to this project.
+> T0 owes the software practices only. T3 owes all of them. Raising autonomy or
+> removing a human review step raises the tier and re-opens the design gate.
 
 ---
 

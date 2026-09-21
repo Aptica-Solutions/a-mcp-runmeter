@@ -1,37 +1,41 @@
 {
   "schema_version": 1,
   "source_repository": "Aptica-Solutions/a-repo-template",
-  "template_release": "template-v2026.07.2",
-  "template_commit": "ff8f02915cde37fd0257e65cfb255086d869321b",
+  "template_release": "template-v2026.09.6",
+  "template_commit": "e6ca69ed5444cfd3599c6d0fffc31ec161718759",
   "template_profile": "standard",
-  "applied_at": "2026-07-26T03:15:39.548144+00:00",
+  "applied_at": "2026-09-21T00:39:23.477661+00:00",
   "files": {
-    "CLAUDE.md": {
-      "template_blob": "325fb2d0670a1decf6dbea677b65827646dbc069",
-      "policy": "three-way"
-    },
     "AGENTS.md": {
-      "template_blob": "ab1dc8001a16c74c52c5c284c6f86d0971cca292",
-      "policy": "three-way"
+      "template_blob": "451278fef2a543c744c93bb7946754982eaa3323",
+      "policy": "sectioned"
     },
-    "GEMINI.md": {
-      "template_blob": "5e4af6de4534bcac0aed90e57511d5a89d7c55e0",
-      "policy": "three-way"
+    "CLAUDE.md": {
+      "template_blob": "43c994c2d3617f947bcb5adf1933e21dabe46bb5",
+      "policy": "overwrite"
     },
     "_engineer/ENGINEER-README.md": {
-      "template_blob": "007bb3297aa4326e8335598a4cd894b65724f2f9",
+      "template_blob": "c49c958f74074f3e047c28804ad7cb26f916d113",
       "policy": "three-way"
     },
     "_engineer/ENGINEER-FLOW.md": {
-      "template_blob": "6a3f38537bfcb0f9e276fa9730e8243ce7d70a13",
+      "template_blob": "8e3e4e2cdc06124b09570e1f3cd508ac673c02ef",
+      "policy": "three-way"
+    },
+    "_engineer/ASSURANCE.md": {
+      "template_blob": "308a89ab480f2911dbb95fab88a84ab5cf20b8af",
+      "policy": "three-way"
+    },
+    "_engineer/ONBOARDING.template.md": {
+      "template_blob": "fd6044fd76fca4faca49d28347c1755748a9713c",
       "policy": "three-way"
     },
     "_engineer/REQUIREMENTS.template.md": {
-      "template_blob": "0d953b5b0fe216e1f38d0f6648137eed490eab36",
+      "template_blob": "aec59a0771eaf8100540900090513493a7f6c8ab",
       "policy": "three-way"
     },
     "_engineer/ENGINEER-TASKS.md": {
-      "template_blob": "7bb4774fd99d3f4910017b55f2ed47bbdd40194e",
+      "template_blob": "abd0764c91cd1d93bad583d173ef1300e9f6a5ec",
       "policy": "seed"
     },
     "AI-TASKS.template.md": {
@@ -67,11 +71,11 @@
       "policy": "three-way"
     },
     "_engineer/dev-env/functions.ps1": {
-      "template_blob": "7b49b87341f672b0fba6756a97b874c585c50d08",
+      "template_blob": "2d1449fde912f3672f0dc80026fc094bcf9fd720",
       "policy": "three-way"
     },
     "_engineer/dev-env/init-repo-tooling.ps1": {
-      "template_blob": "529dab05700aae7f3da9ec2cfd653bce7c675caa",
+      "template_blob": "a6445c5cb20c550a930df5274bc0528d8da7657b",
       "policy": "three-way"
     },
     "_engineer/dev-env/PROFILE-README.md": {
@@ -83,11 +87,27 @@
       "policy": "three-way"
     },
     "_engineer/dev-env/template-sync.ps1": {
-      "template_blob": "f0e0b7a56d0ec2e19e24ae52bb1844ac8ebc50a6",
+      "template_blob": "99d6173f3888e34ce5b15df5324388252b1f5bf1",
       "policy": "three-way"
     },
     "_engineer/dev-env/template_sync.py": {
-      "template_blob": "d52a97b4e9cfa29f4565bc1194335ae72cc07fc9",
+      "template_blob": "497f26b49c8c2164bd92f17f5b36f3455c5a4730",
+      "policy": "three-way"
+    },
+    "_engineer/ai-cost/configure.py": {
+      "template_blob": "61200533f7baed06c11d9973e47555648f21955a",
+      "policy": "three-way"
+    },
+    "_engineer/ai-cost/launch.py": {
+      "template_blob": "1f43f8e0ff1e0aaef08deed474a97f6834920e4e",
+      "policy": "three-way"
+    },
+    "_engineer/ai-cost/recorder.py": {
+      "template_blob": "31272e29774708e235cf37655f3918f268ba77d7",
+      "policy": "three-way"
+    },
+    "_engineer/ai-cost/README.md": {
+      "template_blob": "2985360517b4d693c97562f8c280c00824530e92",
       "policy": "three-way"
     },
     "_engineer/dev-env/log_util.py": {
@@ -107,7 +127,7 @@
       "policy": "three-way"
     },
     ".claude/hooks/check-templatefiles.py": {
-      "template_blob": "fc8bb65c7df3c7bdcc3e61cba00683b224205785",
+      "template_blob": "2570616e3bc18ec1b80a362e27d91fc2e9aa0d90",
       "policy": "three-way"
     },
     ".claude/hooks/strip-ai-coauthors.py": {
@@ -115,24 +135,20 @@
       "policy": "three-way"
     },
     ".claude/settings.json": {
-      "template_blob": "cc467bd1ca0d68b5f1bd5f3cc882f6f1f4a68b15",
+      "template_blob": "8777856edaca64686069ed44395cc56531221967",
       "policy": "three-way"
     },
     ".github/workflows/template-boundary.yml": {
-      "template_blob": "b8a477021d953fa30a52226facae1994ec12d531",
+      "template_blob": "5b6e182c11b99a3a61895ce33fbcdbf84b689f85",
       "policy": "three-way"
     },
     ".github/dependabot.yml": {
-      "template_blob": "fba86ba3e555a369757884c3b905777cd9c82058",
+      "template_blob": "6e5e65021bda350c5835a0cca848ea1719bb5765",
       "policy": "seed"
     },
     ".github/CODEOWNERS": {
       "template_blob": "95795674fe5062d08537ebd7ca2fe4594c2dd9e8",
       "policy": "seed"
-    },
-    ".github/copilot-instructions.md": {
-      "template_blob": "037fc4654bec32b5920312476630807aba69a7f1",
-      "policy": "three-way"
     },
     ".pre-commit-config.yaml": {
       "template_blob": "6aeab9630b8eed4436dce454487769eea7b95e36",
@@ -151,7 +167,7 @@
       "policy": "three-way"
     },
     "docs/GOVERNANCE.template.md": {
-      "template_blob": "f5be03efa97acbb3f3bf5cdcd55bb9e2e1a8b8e7",
+      "template_blob": "4e766b11c07714054402a1de833b567320e28b69",
       "policy": "three-way"
     },
     "docs/INFRA.template.md": {

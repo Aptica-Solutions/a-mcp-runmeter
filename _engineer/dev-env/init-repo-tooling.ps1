@@ -339,6 +339,16 @@ if (Test-Path ".env") {
     }
 }
 
+if (Test-Path '_engineer/ai-cost/configure.py') {
+    $costPython = if (Test-Cmd 'python3') { 'python3' } elseif (Test-Cmd 'python') { 'python' } else { $null }
+    if ($costPython) {
+        & $costPython '_engineer/ai-cost/configure.py'
+        if ($LASTEXITCODE -ne 0) { $fail.Add('AI cost configuration failed') }
+    } else {
+        $warn.Add('AI cost configuration needs Python')
+    }
+}
+
 # ── Summary ──────────────────────────────────────────────────────────────────
 Write-Host "`n========================================" -ForegroundColor Cyan
 Write-Host " Verification Summary" -ForegroundColor Cyan
