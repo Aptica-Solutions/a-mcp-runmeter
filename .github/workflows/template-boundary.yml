@@ -3,6 +3,8 @@ name: Template Boundary Check
 on:
   pull_request:
     branches: [main]
+  push:
+    branches: [main]
 
 permissions:
   contents: read
@@ -21,6 +23,11 @@ jobs:
         run: python3 .claude/hooks/check-templatefiles.py --check-manifest
 
       - name: Validate changed files against .templatefiles
+        if: github.event_name == 'pull_request'
         run: |
           git diff --name-only origin/${{ github.base_ref }}...HEAD \
             | python3 .claude/hooks/check-templatefiles.py
+
+      - name: Validate optional AI cost integration
+        if: hashFiles('_engineer/ai-cost/tests/test_configure.py') != ''
+        run: python3 -m unittest discover -s _engineer/ai-cost/tests

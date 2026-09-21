@@ -89,7 +89,7 @@ def validate_policy(root: Path) -> list[str]:
         return [f".template-policy.json is invalid: {error}"]
 
     errors = []
-    allowed_policies = {"three-way", "seed"}
+    allowed_policies = {"three-way", "seed", "sectioned", "overwrite"}
     if policy.get("schema_version") != 1:
         errors.append(".template-policy.json schema_version must be 1.")
     if policy.get("default_policy") not in allowed_policies:
@@ -98,9 +98,11 @@ def validate_policy(root: Path) -> list[str]:
         )
 
     profiles = policy.get("profiles")
+    dead_excludes = []
     if not isinstance(profiles, dict) or not profiles:
         errors.append(".template-policy.json profiles must be a non-empty object.")
     else:
+        distributable_paths = load_distributable_entries(root)
         for name, definition in profiles.items():
             includes = definition.get("include") if isinstance(definition, dict) else None
             if not isinstance(includes, list) or not all(
@@ -109,6 +111,29 @@ def validate_policy(root: Path) -> list[str]:
                 errors.append(
                     f".template-policy.json profile '{name}' must have a string include list."
                 )
+            excludes = definition.get("exclude") if isinstance(definition, dict) else None
+            if excludes is None:
+                continue
+            if not isinstance(excludes, list) or not all(
+                isinstance(pattern, str) and pattern for pattern in excludes
+            ):
+                errors.append(
+                    f".template-policy.json profile '{name}' exclude must be a string list."
+                )
+                continue
+            # A literal exclude naming a path the manifest no longer ships is dead
+            # config: it silently stops protecting anything.
+            dead_excludes.extend(
+                f"{name}: {pattern}"
+                for pattern in excludes
+                if not any(character in pattern for character in "*?[")
+                and pattern not in distributable_paths
+            )
+    if dead_excludes:
+        errors.append(
+            "Profile exclude patterns missing from the DISTRIBUTABLE section:\n  "
+            + "\n  ".join(sorted(dead_excludes))
+        )
 
     path_policies = policy.get("path_policies", {})
     if not isinstance(path_policies, dict):
@@ -204,6 +229,12 @@ def main() -> None:
                 print(f"{error}\n", file=sys.stderr)
             sys.exit(1)
         print("Template manifest integrity check passed.")
+        if not files:
+            # --check-manifest is always invoked standalone: a dedicated CI step
+            # and a pre-commit hook with pass_filenames: false. Falling through
+            # to the stdin read blocks forever in any non-interactive caller
+            # that leaves stdin open rather than closing it.
+            sys.exit(0)
 
     if not files:
         if sys.stdin.isatty():
@@ -214,7 +245,14 @@ def main() -> None:
         sys.exit(0)
 
     allowed = set(entries)
-    violations = [f for f in files if Path(f).as_posix() not in allowed]
+    # A path that no longer exists is a deletion. Retiring a template file removes
+    # it from the manifest in the same change, so it can never be listed there.
+    # The boundary governs what the template contains, not what it stops containing.
+    violations = [
+        f
+        for f in files
+        if Path(f).as_posix() not in allowed and (root / f).exists()
+    ]
 
     if violations:
         print(

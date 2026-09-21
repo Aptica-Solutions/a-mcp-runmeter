@@ -21,7 +21,7 @@
 param(
     [string]$TemplateRemote = "template",
     [string]$TemplateRef = "main",
-    [ValidateSet("standard", "nested-template", "lightweight", "exempt")]
+    [ValidateSet("standard", "standard-local-docs", "nested-template", "lightweight", "exempt")]
     [string]$Profile = "standard",
     [string]$TemplateRelease = "",
     [string]$LockPath = ".aptica/template-lock.json",

@@ -1,7 +1,7 @@
 # Engineer README
 
 Shared AI rules, conventions, and guardrails for this project template.
-Read by AI assistants as a detailed supplement to the root context files (CLAUDE.md, AGENTS.md, GEMINI.md).
+Read by AI assistants as a detailed supplement to the root rules file (AGENTS.md).
 
 ---
 
@@ -9,9 +9,8 @@ Read by AI assistants as a detailed supplement to the root context files (CLAUDE
 
 ```
 repo-root/
-├── CLAUDE.md                       Claude Code context (auto-loaded)
-├── AGENTS.md                       Codex CLI context (auto-loaded)
-├── GEMINI.md                       Gemini CLI context (auto-loaded)
+├── AGENTS.md                       Rules for every AI agent (the only authored rules file)
+├── CLAUDE.md                       One-line stub that imports AGENTS.md
 ├── AI-TASKS.md                     Active project task list
 ├── ONBOARDING.md                       Completed project survey (written by /project-init)
 ├── REQUIREMENTS.md                 Project requirements (written from template)
@@ -44,7 +43,6 @@ repo-root/
 │   ├── commands/                   Slash commands (/project-init, /handoff)
 │   └── hooks/                      UserPromptSubmit hooks (onboarding gate)
 ├── .github/
-│   ├── copilot-instructions.md     GitHub Copilot context
 │   ├── dependabot.yml              Dependency update configuration
 │   ├── CODEOWNERS                  Required reviewers for sensitive paths
 │   └── workflows/secret-scan.yml  CI — gitleaks on push and PR
@@ -360,6 +358,10 @@ the selected template release's history:
 - content that never appeared in template history is preserved as a downstream
   customization; and
 - seed-policy files are always preserved when they already exist.
+- sectioned-policy files (`AGENTS.md`) never conflict: the template owns everything outside the
+  `<!-- repo-rules:begin -->` and `<!-- repo-rules:end -->` markers and the repository owns the block between
+  them. A file with no markers migrates once, with its previous content moved into the block.
+- overwrite-policy files (`CLAUDE.md`) are always the template version. Put repo rules in the `AGENTS.md` block.
 
 The engine also removes a copied `.is-template-repo` marker from downstream
 repositories. Canonical-template status always requires both the marker and the
@@ -371,11 +373,45 @@ profile, and per-file template blobs. Later runs use that baseline to:
 - update files unchanged by the downstream repository;
 - preserve downstream-only changes and seed files;
 - three-way merge non-overlapping edits;
+- delete a file listed under `retired_paths` in `.template-policy.json` even when the repository
+  changed it: the lines the repository added move into the `AGENTS.md` repo-owned block under a
+  "Carried over from" heading, and a file the repository only trimmed is simply deleted;
+- update a file the lock does not name when it is byte-for-byte a version the template once
+  shipped, since nothing downstream can be lost;
 - stop on overlapping edits or unsafe deletions; and
 - advance the lock only after a conflict-free apply.
 
 Commit synchronized files and the lock together. `.TODO-` prefixed files remain
 manual-adoption assets and are skipped automatically.
+
+## Synchronization profiles
+
+The `-Profile` value selects which DISTRIBUTABLE paths a repository owns. It is
+mirrored by the `template_profile` GitHub organization property.
+
+| Profile | Owns |
+|---------|------|
+| `standard` | Every DISTRIBUTABLE path |
+| `standard-local-docs` | Every DISTRIBUTABLE path except the engineer-layer docs a repo maintains itself |
+| `nested-template` | Every DISTRIBUTABLE path |
+| `lightweight` | AI context files, `.claude/`, and the shared CI and pre-commit config |
+| `exempt` | Nothing |
+
+A profile may declare an `exclude` list in `.template-policy.json`. An excluded
+path is disclaimed entirely: the engine neither delivers nor updates it, and it
+is never read as a template removal when a stale lock entry names it. Use this
+when a repository has deliberately forked or retired a distributed file, so that
+the fork is recorded as policy rather than surviving as unexplained drift.
+
+Excluding a path does not delete the downstream copy. Remove the path's entry
+from `.aptica/template-lock.json` in the same change so the engine stops
+tracking a file it no longer manages.
+
+Moving a repository to a narrower profile releases the paths the new profile does not own.
+The template still ships them, so this is not a template removal: the engine reports them as
+`preserve` with policy `released`, leaves every file in place whether or not the repository
+edited it, and drops them from the lock. Delete the ones the repository no longer wants in an
+ordinary commit.
 
 ---
 
@@ -491,3 +527,7 @@ Produce these documents from templates in `docs/` when requested:
 | `SYSADMIN.template.md` | SysAdmin |
 
 After adding a doc, update `docs/DOC-TOC.md` with a one-line description.
+
+## AI cost onboarding integration
+
+After the user confirms ONBOARDING.md, run `python _engineer/ai-cost/configure.py` to apply the explicit AI cost choice. If no choice is present, leave existing configuration unchanged. Verify the selected collector separately; configuration alone does not instrument provider calls.

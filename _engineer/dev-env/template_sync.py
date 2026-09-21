@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import difflib
 import fnmatch
 import json
 import os
@@ -20,8 +21,19 @@ from typing import Any, NoReturn, Sequence
 
 SOURCE_REPOSITORY = "Aptica-Solutions/a-repo-template"
 TEMPLATE_MARKER = ".is-template-repo"
-SUPPORTED_POLICIES = {"three-way", "seed"}
-SUPPORTED_PROFILES = {"standard", "nested-template", "lightweight", "exempt"}
+SUPPORTED_POLICIES = {"three-way", "seed", "sectioned", "overwrite"}
+REPO_BLOCK_BEGIN = b"<!-- repo-rules:begin -->"
+REPO_BLOCK_END = b"<!-- repo-rules:end -->"
+# git merge-file reports conflict counts up to this value; anything higher
+# is a genuine tool error rather than a conflicted merge.
+MERGE_CONFLICT_LIMIT = 127
+SUPPORTED_PROFILES = {
+    "standard",
+    "standard-local-docs",
+    "nested-template",
+    "lightweight",
+    "exempt",
+}
 CANONICAL_TEMPLATE_ORIGIN = re.compile(
     r"^(https://github\.com/|git@github\.com:|ssh://git@github\.com/)"
     r"(Aptica-Solutions/a-repo-template|szeltneraptica/repo-template)"
@@ -220,19 +232,55 @@ def load_policy(root: Path, ref: str) -> dict[str, Any]:
         raise SyncError("Template profiles must be an object.")
     if not isinstance(policy.get("path_policies", {}), dict):
         raise SyncError("Template path_policies must be an object.")
+    retired = policy.get("retired_paths", {})
+    if not isinstance(retired, dict):
+        raise SyncError("Template retired_paths must be an object.")
+    for retired_path, disposition in retired.items():
+        validate_relative_path(retired_path, "Retired path")
+        target = disposition.get("absorb_into") if isinstance(disposition, dict) else None
+        if not isinstance(target, str):
+            raise SyncError(
+                f"Retired path '{retired_path}' must define a string absorb_into."
+            )
+        validate_relative_path(target, "Retired absorb_into path")
     return policy
 
 
-def manifest_files(root: Path, ref: str, policy: dict[str, Any], profile: str) -> list[str]:
+def profile_patterns(
+    policy: dict[str, Any],
+    profile: str,
+    key: str,
+    required: bool,
+) -> list[str]:
     profile_definition = policy["profiles"].get(profile)
     if not isinstance(profile_definition, dict):
         raise SyncError(f"Profile '{profile}' is not defined in .template-policy.json.")
-    include_patterns = profile_definition.get("include")
-    if not isinstance(include_patterns, list) or not all(
-        isinstance(pattern, str) and pattern for pattern in include_patterns
+    patterns = profile_definition.get(key)
+    if patterns is None and not required:
+        return []
+    if not isinstance(patterns, list) or not all(
+        isinstance(pattern, str) and pattern for pattern in patterns
     ):
-        raise SyncError(f"Profile '{profile}' must define a string include list.")
+        raise SyncError(f"Profile '{profile}' must define a string {key} list.")
+    for pattern in patterns:
+        validate_relative_path(pattern, f"Profile {key} pattern")
+    return patterns
 
+
+def excluded_by_profile(relative_path: str, exclude_patterns: Sequence[str]) -> bool:
+    """Return whether a profile disclaims ownership of a template path.
+
+    An excluded path is neither delivered nor deleted: the downstream repository
+    owns it outright, so a lingering lock entry must not be read as a template
+    removal.
+    """
+    return any(
+        fnmatch.fnmatchcase(relative_path, pattern) for pattern in exclude_patterns
+    )
+
+
+def distributable_paths(root: Path, ref: str) -> list[str]:
+    """Return every path the template distributes, before any profile narrows it."""
     content = ref_bytes(root, ref, ".templatefiles").decode("utf-8")
     files: list[str] = []
     in_distributable = False
@@ -248,9 +296,96 @@ def manifest_files(root: Path, ref: str, policy: dict[str, Any], profile: str) -
         validate_relative_path(line, "Manifest entry")
         if PurePosixPath(line).name.startswith(".TODO"):
             continue
-        if any(fnmatch.fnmatchcase(line, pattern) for pattern in include_patterns):
-            files.append(line)
+        files.append(line)
     return files
+
+
+def manifest_files(root: Path, ref: str, policy: dict[str, Any], profile: str) -> list[str]:
+    include_patterns = profile_patterns(policy, profile, "include", True)
+    exclude_patterns = profile_patterns(policy, profile, "exclude", False)
+    return [
+        line
+        for line in distributable_paths(root, ref)
+        if not excluded_by_profile(line, exclude_patterns)
+        and any(fnmatch.fnmatchcase(line, pattern) for pattern in include_patterns)
+    ]
+
+
+def split_repo_block(content: bytes) -> tuple[bytes, bytes, bytes] | None:
+    """Return (before, block, after) around the repo-owned block, markers excluded."""
+    begin = content.find(REPO_BLOCK_BEGIN)
+    end = content.find(REPO_BLOCK_END)
+    if begin < 0 or end < begin:
+        return None
+    start = begin + len(REPO_BLOCK_BEGIN)
+    return content[:start], content[start:end], content[end:]
+
+
+def sectioned_content(source: bytes, current: bytes | None, current_is_template: bool) -> bytes:
+    """Template text with the downstream repo-owned block carried over.
+
+    The template owns everything outside the markers. The downstream repository
+    owns what sits between them, so this policy never conflicts. A file with no
+    markers migrates once: content that was never a template version moves into
+    the block whole, and an untouched template version keeps the default block.
+    """
+    parts = split_repo_block(source)
+    if parts is None or current is None:
+        return source
+    before, _, after = parts
+    downstream = split_repo_block(current)
+    if downstream is not None:
+        block = downstream[1]
+    elif current_is_template:
+        return source
+    else:
+        block = b"\n" + current.strip() + b"\n"
+    return before + block + after
+
+
+def downstream_additions(current: bytes, baseline: bytes) -> bytes:
+    """Lines the downstream repository added to a template file, in order.
+
+    What a repository contributed to a template-owned file is exactly what it
+    added relative to the version it received. Deletions and untouched template
+    text carry nothing worth keeping once the template retires the file.
+    """
+    current_lines = current.decode("utf-8", errors="replace").splitlines()
+    baseline_lines = baseline.decode("utf-8", errors="replace").splitlines()
+    added: list[str] = []
+    matcher = difflib.SequenceMatcher(a=baseline_lines, b=current_lines, autojunk=False)
+    for tag, _, _, start, end in matcher.get_opcodes():
+        if tag in {"insert", "replace"}:
+            if added and added[-1] != "":
+                added.append("")
+            added.extend(current_lines[start:end])
+    while added and not added[-1].strip():
+        added.pop()
+    while added and not added[0].strip():
+        added.pop(0)
+    if not any(line.strip() for line in added):
+        return b""
+    return ("\n".join(added) + "\n").encode("utf-8")
+
+
+def absorb_into_block(target: bytes, retired_path: str, additions: bytes) -> bytes | None:
+    """Append a retired file's downstream additions to the repo-owned block.
+
+    Returns None when the target has no repo-owned block. Re-running is a no-op:
+    the carried-over heading marks content that has already been absorbed.
+    """
+    parts = split_repo_block(target)
+    if parts is None:
+        return None
+    before, block, after = parts
+    heading = f"## Carried over from `{retired_path}`".encode("utf-8")
+    if heading in block:
+        return target
+    note = (
+        b"The template retired that file. These are the lines this repository had "
+        b"added to it. Review and tidy.\n\n"
+    )
+    return before + block.rstrip(b"\n") + b"\n\n" + heading + b"\n\n" + note + additions + after
 
 
 def load_lock(root: Path, lock_path: str) -> dict[str, Any] | None:
@@ -299,12 +434,18 @@ def merge_bytes(current: bytes, baseline: bytes, requested: bytes) -> bytes | No
             check=False,
             capture_output=True,
         )
+        # git merge-file returns the number of conflicts, capped at 127, not a
+        # plain 0/1. Treating any count above one as a tool failure aborted the
+        # whole run on files that simply conflicted in more than one hunk.
         if completed.returncode == 0:
             return completed.stdout
-        if completed.returncode == 1:
+        if 0 < completed.returncode <= MERGE_CONFLICT_LIMIT:
             return None
         detail = completed.stderr.decode("utf-8", errors="replace").strip()
-        raise SyncError(f"git merge-file failed: {detail}")
+        raise SyncError(
+            f"git merge-file failed with exit {completed.returncode}: "
+            f"{detail or 'no diagnostic output'}"
+        )
 
 
 def add_result(
@@ -392,6 +533,8 @@ def synchronize(arguments: argparse.Namespace) -> dict[str, Any]:
     release = arguments.template_release or arguments.template_ref
     policy = load_policy(root, resolved_ref)
     files = manifest_files(root, resolved_ref, policy, arguments.profile)
+    still_distributed = set(distributable_paths(root, resolved_ref))
+    exclude_patterns = profile_patterns(policy, arguments.profile, "exclude", False)
     lock = load_lock(root, arguments.lock_path)
 
     old_commit = str(lock["template_commit"]) if lock else ""
@@ -413,6 +556,7 @@ def synchronize(arguments: argparse.Namespace) -> dict[str, Any]:
     new_file_state: OrderedDict[str, dict[str, str]] = OrderedDict()
     pending_writes: OrderedDict[str, PendingWrite] = OrderedDict()
     pending_deletes: list[str] = []
+    retired_modified: list[str] = []
 
     if stale_template_marker:
         add_result(
@@ -466,6 +610,28 @@ def synchronize(arguments: argparse.Namespace) -> dict[str, Any]:
             add_result(results, relative_path, "unchanged", path_policy)
             continue
 
+        if path_policy in {"sectioned", "overwrite"} and current_blob is not None:
+            source_content = ref_bytes(root, resolved_ref, relative_path)
+            current_content = repository_path(root, relative_path).read_bytes()
+            if path_policy == "overwrite":
+                requested, detail = source_content, "Template owns this file outright."
+            else:
+                is_template = current_blob == baseline_blob or ref_history_contains_blob(
+                    root, resolved_ref, relative_path, current_blob
+                )
+                requested = sectioned_content(source_content, current_content, is_template)
+                detail = (
+                    "Repo-owned block kept."
+                    if split_repo_block(current_content) is not None or is_template
+                    else "Migrated: previous downstream content moved into the repo-owned block."
+                )
+            if requested == current_content:
+                add_result(results, relative_path, "unchanged", path_policy)
+            else:
+                add_result(results, relative_path, "update", path_policy, detail)
+                pending_writes[relative_path] = PendingWrite(requested)
+            continue
+
         if path_policy == "seed" and current_blob is not None:
             add_result(
                 results,
@@ -483,6 +649,23 @@ def synchronize(arguments: argparse.Namespace) -> dict[str, Any]:
             continue
 
         if baseline_blob is None:
+            if not arguments.accept_existing_as_baseline and ref_history_contains_blob(
+                root,
+                resolved_ref,
+                relative_path,
+                current_blob,
+            ):
+                # No lock entry, but the file is byte-for-byte a version the
+                # template once shipped, so nothing downstream can be lost.
+                add_result(
+                    results,
+                    relative_path,
+                    "update",
+                    path_policy,
+                    "No baseline, but the file is an exact historical template version.",
+                )
+                pending_writes[relative_path] = PendingWrite(source_content)
+                continue
             if arguments.accept_existing_as_baseline:
                 if ref_history_contains_blob(
                     root,
@@ -555,6 +738,28 @@ def synchronize(arguments: argparse.Namespace) -> dict[str, Any]:
             validate_relative_path(relative_path, "Locked path")
             if relative_path in new_file_state:
                 continue
+            if excluded_by_profile(relative_path, exclude_patterns):
+                add_result(
+                    results,
+                    relative_path,
+                    "preserve",
+                    "excluded",
+                    "Profile excludes this path; downstream owns it.",
+                )
+                continue
+            if relative_path in still_distributed:
+                # The template still ships this path; this profile just does not
+                # own it. That is a profile change, not a template removal, so
+                # the file is released to the repository: never deleted, never
+                # a conflict, and dropped from the lock.
+                add_result(
+                    results,
+                    relative_path,
+                    "preserve",
+                    "released",
+                    "Outside this profile; downstream owns it.",
+                )
+                continue
             baseline_blob = str(locked_file.get("template_blob", ""))
             current_blob = worktree_blob(root, relative_path)
             if current_blob is None:
@@ -568,6 +773,8 @@ def synchronize(arguments: argparse.Namespace) -> dict[str, Any]:
             elif current_blob == baseline_blob:
                 add_result(results, relative_path, "delete", "removed")
                 pending_deletes.append(relative_path)
+            elif relative_path in policy.get("retired_paths", {}):
+                retired_modified.append(relative_path)
             else:
                 add_result(
                     results,
@@ -576,6 +783,61 @@ def synchronize(arguments: argparse.Namespace) -> dict[str, Any]:
                     "removed",
                     "Removed from template but modified downstream.",
                 )
+
+    for relative_path in retired_modified:
+        target_path = policy["retired_paths"][relative_path]["absorb_into"]
+        additions = downstream_additions(
+            repository_path(root, relative_path).read_bytes(),
+            ref_bytes(root, old_commit, relative_path),
+        )
+        if not additions:
+            add_result(
+                results,
+                relative_path,
+                "delete",
+                "retired",
+                "Retired by the template; downstream only removed text, nothing to keep.",
+            )
+            pending_deletes.append(relative_path)
+            continue
+        if target_path in pending_writes:
+            target_content: bytes | None = pending_writes[target_path].content
+        elif target_path in new_file_state and repository_path(root, target_path).is_file():
+            target_content = repository_path(root, target_path).read_bytes()
+        else:
+            target_content = None
+        absorbed = (
+            absorb_into_block(target_content, relative_path, additions)
+            if target_content is not None
+            else None
+        )
+        if absorbed is None:
+            add_result(
+                results,
+                relative_path,
+                "conflict",
+                "retired",
+                f"Retired and modified downstream, but {target_path} has no repo-owned "
+                "block in this profile to absorb it.",
+            )
+            continue
+        pending_writes[target_path] = PendingWrite(absorbed)
+        for item in results:
+            if item["path"] == target_path and item["action"] == "unchanged":
+                item["action"] = "update"
+        for item in results:
+            if item["path"] == target_path:
+                item["detail"] = (
+                    item["detail"] + " " if item["detail"] else ""
+                ) + f"Absorbed downstream additions from {relative_path}."
+        add_result(
+            results,
+            relative_path,
+            "delete",
+            "retired",
+            f"Retired by the template; downstream additions moved into {target_path}.",
+        )
+        pending_deletes.append(relative_path)
 
     conflicts = [item for item in results if item["action"] == "conflict"]
     changes = [
