@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "source_repository": "Aptica-Solutions/a-repo-template",
-  "template_release": "template-v2026.09.6",
-  "template_commit": "e6ca69ed5444cfd3599c6d0fffc31ec161718759",
+  "template_release": "template-v2026.09.7",
+  "template_commit": "ce842304056ab975e1fbbae75f36be9cea5a1d7a",
   "template_profile": "standard",
-  "applied_at": "2026-09-21T00:39:23.477661+00:00",
+  "applied_at": "2026-09-24T23:49:25.255481+00:00",
   "files": {
     "AGENTS.md": {
-      "template_blob": "451278fef2a543c744c93bb7946754982eaa3323",
+      "template_blob": "0327206846bdaa3d4aff92bc2543e3057feea49f",
       "policy": "sectioned"
     },
     "CLAUDE.md": {
@@ -87,7 +87,7 @@
       "policy": "three-way"
     },
     "_engineer/dev-env/template-sync.ps1": {
-      "template_blob": "99d6173f3888e34ce5b15df5324388252b1f5bf1",
+      "template_blob": "49600cd35fed2bcf8fd0ff61b110080606b059da",
       "policy": "three-way"
     },
     "_engineer/dev-env/template_sync.py": {

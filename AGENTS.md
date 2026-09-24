@@ -14,6 +14,17 @@ themselves still do.
 
 ---
 
+## Work Ledger: check it first
+
+Before answering any question about prior work, history or status, and at the start
+of every task, call `brain_ledger_search` on the a-brain MCP server (the Codex
+namespace is `a_brain`) for the repo or topic. Treat what it returns as the first
+source; use `gh` or git only to verify or extend it, and say which you used. When a
+task finishes, call `brain_ledger_add` with one line. This is how one tool learns
+what another already did.
+
+---
+
 ## This Repository
 
 The block between the markers belongs to this repository. Template sync never
@@ -210,14 +221,6 @@ cp .env.example .env  # fill in Azure credentials
   to apply the explicit AI cost choice. Configure only the selected scope. If no choice
   is present, leave existing configuration unchanged. Registration is not proof that
   provider usage is being collected, so verify the selected collector separately
-
----
-
-## Work Ledger
-
-When the a-brain MCP server is available, call `brain_ledger_search` at the start of
-a task to find prior work on the same subject, and call `brain_ledger_add` with one
-line when the task finishes. This is how one tool learns what another already did.
 
 ---
 
