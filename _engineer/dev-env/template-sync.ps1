@@ -33,6 +33,40 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
+function Resolve-PythonCommand {
+    <#
+    .SYNOPSIS
+        Return the path of a usable Python 3 interpreter, or throw.
+
+    .DESCRIPTION
+        macOS and most Linux distributions ship only `python3`; Windows ships
+        `python` and reserves `python3` for a Store stub that opens a browser
+        when nothing is installed. The wrapper therefore prefers the name each
+        platform actually provides and falls back to the other, so no caller
+        has to shim a `python` symlink onto PATH before running the sync.
+        APTICA_PYTHON overrides both, for pinned or virtualenv interpreters.
+    #>
+    $override = [System.Environment]::GetEnvironmentVariable("APTICA_PYTHON")
+    if ($override) {
+        if (-not (Test-Path -LiteralPath $override -PathType Leaf)) {
+            throw "APTICA_PYTHON is set but does not resolve to a file: $override"
+        }
+        return $override
+    }
+    $isWindowsHost = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform(
+        [System.Runtime.InteropServices.OSPlatform]::Windows)
+    $candidates = if ($isWindowsHost) { @("python", "python3") } else { @("python3", "python") }
+    foreach ($name in $candidates) {
+        $command = Get-Command $name -CommandType Application -ErrorAction SilentlyContinue |
+            Select-Object -First 1
+        if ($command) {
+            return $command.Source
+        }
+    }
+    throw "No Python interpreter found on PATH (tried: $($candidates -join ', ')). Set APTICA_PYTHON to override."
+}
+
+$python = Resolve-PythonCommand
 $pythonScript = Join-Path $PSScriptRoot "template_sync.py"
 if (-not (Test-Path -LiteralPath $pythonScript -PathType Leaf)) {
     throw "Template sync engine not found: $pythonScript"
@@ -59,5 +93,5 @@ if ($Apply) {
     $pythonArguments += "--apply"
 }
 
-& python @pythonArguments
+& $python @pythonArguments
 exit $LASTEXITCODE
